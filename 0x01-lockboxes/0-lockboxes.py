@@ -12,15 +12,15 @@ def canUnlockAll(boxes):
 
         for box in range(len(boxes)):
             """
-            iterating over all the boxes to check if the keys in
+            Iterate over all the boxes to check if the keys in
             each box can open the current unopened box
             """
             if unopened_box in boxes[box] and box != unopened_box:
                 """
-                checks if the current unopened box is
+                Checks if the current unopened box is
                 listed in the keys of the current box.
-                ensures that the current box is not the
-                same as the unopened box
+                Second check prevents self-referential scenarios
+                where a box has its own key.
                 """
                 open = True
                 break

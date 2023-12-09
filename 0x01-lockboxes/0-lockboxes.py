@@ -5,13 +5,26 @@
 def canUnlockAll(boxes):
     """ Method that determines if all boxes can be opened """
 
-    for key in range(1, len(boxes)):
-        flag = False
+    for unopened_box in range(1, len(boxes)):
+
+        open = False
+        # Variable to track if the current unopened box can be opened
+
         for box in range(len(boxes)):
-            if key in boxes[box] and box != key:
-                flag = True
+            """
+            iterating over all the boxes to check if the keys in
+            each box can open the current unopened box
+            """
+            if unopened_box in boxes[box] and box != unopened_box:
+                """
+                checks if the current unopened box is
+                listed in the keys of the current box.
+                ensures that the current box is not the
+                same as the unopened box
+                """
+                open = True
                 break
-        if not flag:
+        if not open:
             return False
 
     return True

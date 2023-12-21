@@ -40,3 +40,4 @@ except KeyboardInterrupt:
     for status_code, count in sorted(status_code_counts.items()):
         if count > 0:
             print(f'{status_code}: {count}')
+    raise

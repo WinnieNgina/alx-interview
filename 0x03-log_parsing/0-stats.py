@@ -1,43 +1,52 @@
 #!/usr/bin/python3
-"""Log parsing"""
+"""
+script that reads stdin line by line and computes metrics
+"""
 import sys
-import re
+import signal
 
-total_file_size = 0
-status_code_counts = {
-    200: 0,
-    301: 0,
-    400: 0,
-    401: 0,
-    403: 0,
-    404: 0,
-    405: 0,
-    500: 0
-}
+# Initialize variables
+status_codes = [200, 301, 400, 401, 403, 404, 405, 500]
+status_dict = dict.fromkeys(status_codes, 0)
+total_size = 0
+line_count = 0
 
-log_entry_pattern = re.compile(
-    r'(\d+\.\d+\.\d+\.\d+) - \[.*\] "GET /projects/260 HTTP/1.1" (\d+) (\d+)'
-)
+
+# Function to print statistics
+def print_stats():
+    print("File size: {}".format(total_size))
+    for code in sorted(status_dict):
+        if status_dict[code] > 0:
+            print("{}: {}".format(code, status_dict[code]))
+
+
+# Function to handle keyboard interruption
+def signal_handler(sig, frame):
+    print_stats()
+    sys.exit(0)
+
+
+# Set signal handler
+signal.signal(signal.SIGINT, signal_handler)
 
 try:
-    for i, line in enumerate(sys.stdin):
-        match = log_entry_pattern.match(line)
-        if match:
-            file_size = int(match.group(3))
-            status_code = int(match.group(2))
-            total_file_size += file_size
-            if status_code in status_code_counts:
-                status_code_counts[status_code] += 1
+    for line in sys.stdin:
+        try:
+            parts = line.split()
+            size = int(parts[-1])
+            status = int(parts[-2])
+            total_size += size
+            if status in status_codes:
+                status_dict[status] += 1
+        except (IndexError, ValueError):
+            continue
 
-        if (i + 1) % 10 == 0 or i == 0:
-            print(f'Total file size: {total_file_size}')
-            for status_code, count in sorted(status_code_counts.items()):
-                if count > 0:
-                    print(f'{status_code}: {count}')
+        line_count += 1
+        if line_count % 10 == 0:
+            print_stats()
 
 except KeyboardInterrupt:
-    print(f'Total file size: {total_file_size}')
-    for status_code, count in sorted(status_code_counts.items()):
-        if count > 0:
-            print(f'{status_code}: {count}')
-    raise
+    pass
+
+finally:
+    print_stats()

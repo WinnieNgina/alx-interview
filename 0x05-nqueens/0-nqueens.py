@@ -22,7 +22,10 @@ def solve_nqueens(N):
         """If all queens are placed successfully,
         add the solution to the list"""
         if row == N:
-            solutions.append([[i, board[i]] for i in range(N)])
+            solution_coordinates = []
+            for i in range(N):
+                solution_coordinates.append([i, board[i]])
+            solutions.append(solution_coordinates)
             return
 
         # Try placing a queen in each column of the current row
